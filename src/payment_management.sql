@@ -22,26 +22,19 @@ VALUES
 
 
 --2.2--
-SELECT 
-    strftime('%m', payment_date) AS month,      -- Extract the month from the payment date using strftime
-    strftime('%Y', payment_date) AS year,       -- Extract the year from the payment date using strftime
-    SUM(amount) AS total_revenue                -- Sum the payments for each month
+-- Summing monthly membership fee payments over the past year
+SELECT substr(payment_date, 1, 7) AS month, SUM(amount) AS total_revenue -- SUBSTR gets part of a string starting from a position. 
+-- Useful for dates or text.
 FROM payments
-WHERE payment_type = 'Monthly membership fee'  -- Filter for membership fee payments
-  AND payment_date >= DATE(CURRENT_TIMESTAMP, '-1 year')  -- Consider payments from the last year
-GROUP BY year, month                           -- Group by year and month
-ORDER BY year DESC, month DESC;                -- Sort by year and month (most recent first)
+WHERE payment_type = 'Monthly membership fee'
+  AND payment_date >= date('now', '-1 year')---- Filters payments made in the last year by comparing payment_date to the current date minus one year.
+GROUP BY month;
 
 
 --2.3--
--- Count total number of members
--- Count total number of distinct members
 SELECT COUNT(DISTINCT member_id) AS total_members
 FROM memberships;
 
-
---SELECT COUNT(*) AS total_members
---FROM memberships;
 
 
 
