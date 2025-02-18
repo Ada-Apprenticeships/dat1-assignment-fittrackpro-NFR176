@@ -16,7 +16,7 @@
 -- TODO: Write a query to identify members with expiring memberships this year
 
 
----- Query to list all active memberships with member details
+--5.1--
 SELECT 
     m.member_id, 
     m.first_name, 
@@ -34,7 +34,10 @@ WHERE
 --5.2
 SELECT 
     mem.type AS membership_type, 
-    AVG(strftime('%s', a.check_out_time) - strftime('%s', a.check_in_time)) / 60.0 AS avg_visit_duration_minutes
+    AVG(strftime('%s', a.check_out_time) - strftime('%s', a.check_in_time)) / 60.0 AS avg_visit_duration_minutes -- Selecting membership type and calculating the average visit duration in minutes by subtracting check-in time from check-out time.
+  -- the (strftime etc....) convert the check-in and check-out times to seconds.
+-- Subtracting the two gives the duration in seconds, which is then divided by 60 to get the duration in minutes.)
+
 FROM 
     attendance a
 JOIN 
@@ -42,7 +45,9 @@ JOIN
 JOIN 
     memberships mem ON m.member_id = mem.member_id
 WHERE 
-    a.check_in_time IS NOT NULL AND a.check_out_time IS NOT NULL
+    a.check_in_time IS NOT NULL AND a.check_out_time IS NOT NULL -- -- NOT NULL is used to make sure the column always has a value – it can’t be left blank. 
+-- So, for columns like 'username' or 'email', we’re saying they must always have something filled in.
+
 GROUP BY 
     mem.type;
 
