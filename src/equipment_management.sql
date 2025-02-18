@@ -16,22 +16,11 @@
 -- TODO: Write a query to calculate average age of equipment by type (in days)
 
 
---3.1--
--- Find equipment due for maintenance in the next 30 days
+--3.1
+-- List all equipment with next_maintenance_date in the next 30 days
 SELECT 
-    equipment_id,                        -- The unique identifier for each piece of equipment
-    name,                                 -- The name of the equipment
-    next_maintenance_date                 -- The next scheduled maintenance date
+    equipment_id,                       
+    name,                                
+    next_maintenance_date                 
 FROM equipment
-WHERE next_maintenance_date BETWEEN CURDATE() AND CURDATE() + INTERVAL 30 DAY;  -- Filters dates within the next 30 days
-
---3.2--
-SELECT 
-    equipment_type,                     
-    COUNT(*) AS count                    
-FROM equipment
-WHERE in_stock = TRUE                    -- Only include equipment that is in stock
-GROUP BY equipment_type;
-
-
---3.3--
+WHERE next_maintenance_date BETWEEN DATE('now') AND DATE('now', '+30 days');  -- Filters dates within the next 30 days
