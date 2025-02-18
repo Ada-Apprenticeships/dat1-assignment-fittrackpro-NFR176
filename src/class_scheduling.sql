@@ -29,41 +29,43 @@
 
 --4.1--
 SELECT 
-    c.class_id,  -- The unique ID for each class
-    c.name AS class_name,  --note to self, the AS takes the name of the class from the class table and renames it as class_name.
-    s.staff_name AS instructor_name  -- The name of the instructor
-FROM classes c  -- The 'classes' table is where class information is stored
-JOIN staff s 
-    ON c.instructor_id = s.staff_id;  
-
-    --4.2--
-    SELECT cs.class_id, c.name, cs.start_time, cs.end_time, c.capacity - COUNT(ca.member_id) AS available_spots
-c
-
---4.3--
-
--- Register member with ID 11 for the Spin Class on 2025-02-01
-
-INSERT INTO class_attendance (schedule_id, member_id, attendance_status)
-SELECT cs.schedule_id, 11, 'Registered'  -- Register member 11
+    c.class_id, 
+    c.name AS class_name, 
+    CONCAT(s.first_name, ' ', s.last_name) AS instructor_name -- note to self CONCAt used to combine/concatenates things together- in this instance the instructors  1st and last name 
+FROM 
+    classes c
+JOIN 
+    class_schedule cs ON c.class_id = cs.class_id -- inner join used to ensure that only scheduled classses and ones with an instructor are presented-
+JOIN 
+    staff s ON cs.staff_id = s.staff_id;
+   
+   -- 4.2: 
+SELECT cs.class_id, c.name, cs.start_time, cs.end_time, c.capacity - COUNT(ca.member_id) AS available_spots
 FROM class_schedule cs
 JOIN classes c ON cs.class_id = c.class_id
-WHERE cs.class_id = 3  -- Spin Class
+LEFT JOIN class_attendance ca ON cs.schedule_id = ca.schedule_id
+GROUP BY cs.class_id, c.name, cs.start_time, cs.end_time, c.capacity;
+
+-- 4.3: 
+INSERT INTO class_attendance (schedule_id, member_id, attendance_status)
+SELECT cs.schedule_id, 11, 'Registered'
+FROM class_schedule cs
+JOIN classes c ON cs.class_id = c.class_id
+WHERE cs.class_id = 3  
   AND cs.start_time = '2025-02-01 14:00:00'  -- Class start time
-  AND (SELECT COUNT(*) FROM class_attendance WHERE schedule_id = cs.schedule_id) < c.capacity;  -- Check if there is space
+  AND (SELECT COUNT(*) FROM class_attendance WHERE schedule_id = cs.schedule_id) < c.capacity; 
 
 --4.4--
--- Cancel the registration for member 2 from the Yoga Basics class (schedule_id 7)
 
-DELETE   FROM class_attendance  -- Extra spaces in DELETE clause for no reason
-WHERE schedule_id = 7  -- Yoga Basics class schedule ID
-   AND member_id = 2   -- Member ID 2
-  AND attendance_status = 'Registered';  -- An unnecessary condition, but still works fine
+
+DELETE   FROM class_attendance  
+WHERE schedule_id = 7 
+  AND attendance_status = 'Registered'; 
 
 --4.5--
--- List the top 3 most popular classes by registration count
 
-SELECT c.class_id, --aliases--
+
+SELECT c.class_id, 
        c.name AS class_name, 
        COUNT(ca.member_id) AS registration_count
 FROM classes c
@@ -77,8 +79,10 @@ ORDER BY registration_count DESC--note to self, DESC is used to put the data in 
 LIMIT 3;  -- shows the top 3 classes--
 
 --4.6--
--- Calculate the average number of classes per member without using AVG()
-
-SELECT 
-    (SELECT COUNT(*) FROM class_attendance) * 1.0 / 
-    (SELECT COUNT(DISTINCT member_id) FROM class_attendance) AS average_classes_per_member;
+SELECT AVG(class_count) AS avg_classes_per_member
+FROM (
+    -- Count how many classes each member has attended
+    SELECT member_id, COUNT(*) AS class_count
+    FROM class_attendance
+    GROUP BY member_id  -- group by-- groups rows together with certain values into summary rows--
+);

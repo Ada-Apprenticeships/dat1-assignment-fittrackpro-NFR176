@@ -26,8 +26,8 @@
 
 
 --1.1--
-SELECT m.member_id, m.first_name, m.last_name, m.email, m.join_date
-FROM members m;
+SELECT m.member_id, m.first_name, m.last_name, m.email, m.join_date --taking these columns
+FROM members m; -- from the (members) table
 
 --1.2--
 UPDATE members

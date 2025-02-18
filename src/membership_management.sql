@@ -16,27 +16,47 @@
 -- TODO: Write a query to identify members with expiring memberships this year
 
 
---5.1--
-SELECT m.member_id, m.first_name, m.last_name, ms.type AS membership_type, ms.start_date AS join_date
-FROM members m
-JOIN memberships ms ON m.member_id = ms.member_id
-WHERE ms.status = 'Active';
+---- Query to list all active memberships with member details
+SELECT 
+    m.member_id, 
+    m.first_name, 
+    m.last_name, 
+    mem.type AS membership_type, 
+    mem.start_date AS join_date
+FROM 
+    members m
+JOIN 
+    memberships mem ON m.member_id = mem.member_id
+WHERE 
+    mem.status = 'Active';
 
 
---5.2--
-SELECT ms.type AS membership_type, 
-       AVG(gv.visit_duration) AS avg_visit_duration_minutes
-FROM gym_visits gv
-JOIN memberships ms ON gv.member_id = ms.member_id
-WHERE ms.status = 'Active'
-GROUP BY ms.type
-ORDER BY membership_type;
+--5.2
+SELECT 
+    mem.type AS membership_type, 
+    AVG(strftime('%s', a.check_out_time) - strftime('%s', a.check_in_time)) / 60.0 AS avg_visit_duration_minutes
+FROM 
+    attendance a
+JOIN 
+    members m ON a.member_id = m.member_id
+JOIN 
+    memberships mem ON m.member_id = mem.member_id
+WHERE 
+    a.check_in_time IS NOT NULL AND a.check_out_time IS NOT NULL
+GROUP BY 
+    mem.type;
 
---5.3--
-SELECT m.member_id, m.first_name, m.last_name, m.email, ms.end_date
-FROM members m, memberships ms
-WHERE m.member_id = ms.member_id
-  AND ms.status = 'Active'
-  AND ms.end_date >= CURRENT_DATE
-  AND ms.end_date <= CURRENT_DATE + INTERVAL 1 YEAR;
 
+--5.3
+SELECT 
+    m.member_id, 
+    m.first_name, 
+    m.last_name, 
+    m.email, 
+    mem.end_date
+FROM 
+    members m
+JOIN 
+    memberships mem ON m.member_id = mem.member_id
+WHERE 
+    mem.end_date BETWEEN date('now') AND date('now', '+1 year');
