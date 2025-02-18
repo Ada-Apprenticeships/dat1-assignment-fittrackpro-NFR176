@@ -13,31 +13,33 @@
 -- TODO: Write a query to find trainers with one or more personal training session in the next 30 days
 
 --7,1--
--- 7.1 --
+
 SELECT 
     s.staff_id,        -- The unique ID for each staff member
-    s.first_name,      -- The staff member's first name
-    s.last_name,       -- The staff member's last name
-    s.role             -- The role of the staff member (e.g., trainer, manager, etc.)
+    s.first_name,     --the s. is my alias for staff tabel--
+    s.last_name,       
+    s.position         
 FROM 
-    staff s;           -- Querying from the staff table, aliased as 's'
+    staff s;           
+
 
 
 --7.2--
--- 7.2 --
 SELECT 
-    t.trainer_id, 
-    t.first_name || ' ' || t.last_name AS trainer_name,  -- Concatenating first and last name
-    COUNT(s.session_id) AS session_count
+    s.staff_id,                                     
+    s.first_name || ' ' || s.last_name AS trainer_name, -- Concatenating first and last name to get the trainer's full name
+    COUNT(pts.session_id) AS session_count           
 FROM 
-    trainers t
+    staff s                                           
 JOIN 
-    sessions s ON t.trainer_id = s.trainer_id
+    personal_training_sessions pts                
+    ON s.staff_id = pts.staff_id                    
 WHERE 
-    s.session_date BETWEEN CURDATE() AND DATE(CURDATE(), '+30 day')
+    s.position = 'Trainer'                            -- We only want to get trainers
+    AND pts.session_date BETWEEN date('now') AND date('now', '+30 days')  -- Session date is within the next 30 days
 GROUP BY 
-    t.trainer_id
+    s.staff_id                                       
 HAVING 
-    session_count > 0
+    session_count > 0                                
 ORDER BY 
-    session_count DESC;
+    session_count DESC;                               --  DESC-- Ordering by session count in descending order
