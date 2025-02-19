@@ -17,7 +17,7 @@
 
 
 --3.1
--- List all equipment with next_maintenance_date in the next 30 days
+
 SELECT 
     equipment_id,                       
     name,                                
@@ -28,7 +28,7 @@ WHERE next_maintenance_date BETWEEN DATE('now') AND DATE('now', '+30 days');  --
 --3.2--
 
 SELECT 
-    type AS equipment_type,  -- 'type AS equipment_type' just renames 'type' to 'equipment_type' for easier reading. 'COUNT(*) AS count' counts how many pieces of equipment there are for each type and names it 'count'.
+    type AS equipment_type,  -- 'COUNT(*) AS count' counts how many pieces of equipment there are for each type and names it 'count'.
     COUNT(*) AS count                    
 FROM equipment
 WHERE location_id IS NOT NULL           
