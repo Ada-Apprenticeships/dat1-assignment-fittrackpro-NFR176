@@ -15,7 +15,7 @@
 -- TODO: Write a query to find all day pass purchases
 
 --2.1--
--- Insert a new payment for member 11
+
 INSERT INTO payments (member_id, amount, payment_date, payment_method, payment_type)
 VALUES 
 (11, 50.00, CURRENT_TIMESTAMP, 'Credit Card', 'Monthly membership fee');
