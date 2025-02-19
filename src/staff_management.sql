@@ -16,7 +16,7 @@
 
 SELECT 
     s.staff_id,        -- The unique ID for each staff member
-    s.first_name,     --the s. is my alias for staff tabel--
+    s.first_name,     --the s. is my alias for staff table--
     s.last_name,       
     s.position         
 FROM 
